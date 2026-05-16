@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd scribbbly-client && npm run build",
-  "outputDirectory": "scribbbly-client/.next",
-  "installCommand": "cd scribbbly-client && npm install"
-}
