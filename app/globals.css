@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --font-pixel: "Press Start 2P", cursive;
+  
+  --color-somecolor: #b62828;
+  --color-yellow: #ffd700;
+  --color-green: #00ff41;
+  --color-pink: #ff77a8;
+  --colo-dark-pink: #7a1b3a;
+  --color-blue: #00e5ff;
+  --color-red: #fb2c36;
+  --color-grey: #555588;
+  --color-dark-blue: #2d2d6b;
+  --color-background: #0f0f23;
+  --color-card-background: #12123a;
+  --color-text-white: #e8e8e8;
+  --color-text-muted: #9090b0;
+  --color-border: #000000;
+}
+
