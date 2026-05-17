@@ -10,6 +10,7 @@ import { Room } from "@shared/room";
 import socket from "@/lib/socket/socket";
 import { DRAW_TIME, GAME_ROUNDS, LANGUAGES, PLAYER_COUNT } from "@/lib/constants/all-constants";
 import { WaitingRoomProps } from "@/lib/comp-props/waiting-room-prop";
+import { ROOM_UPDATED, SETTINGS_CHANGE } from "@/shared/socket-names";
 
 const settings: {
     label: string
@@ -25,15 +26,13 @@ const settings: {
 type IdentifierType = 'LANGUAGE' | 'MAX ROUNDS' | 'MAX PLAYERS' | 'DRAW TIME'
 
 const settingKeyMap = {
-    LANGUAGE: 'selectedLanguage',
+    LANGUAGE: 'language',
     'MAX ROUNDS': 'maxRounds',
-    'MAX PLAYERS': 'maxPlayersCount',
+    'MAX PLAYERS': 'maxPlayers',
     'DRAW TIME': 'drawTime'
 } as const
 
-export default function WaitingRoom({ isHost, roomId, onStart }: WaitingRoomProps) {
-
-    const [room, setRoom] = useState<Room | null>(null)
+export default function WaitingRoom({ room, isHost, roomId, onStart }: WaitingRoomProps) {
 
     const isRoomOwner: boolean = room?.players.find(player => player.isHost === true)?.id === socket.id
 
@@ -47,20 +46,18 @@ export default function WaitingRoom({ isHost, roomId, onStart }: WaitingRoomProp
 
         const roomProp = settingKeyMap[identifier]
 
-        socket.emit('settings-change', {
-            roomId,
-            roomProp,
-            value
-        })
+        console.log(roomId, roomProp, value);
+
+        socket.emit(SETTINGS_CHANGE, roomId, roomProp, value)
     }
 
-    useEffect(() => {
-    }, [])
+    console.log(room);
+    
 
     return (
         <div className={`flex flex-col gap-4 p-4 bg-[#1a1a3e] border-2 border-green w-full h-full ${isHost ? '' : 'cursor-not-allowed'} `}>
 
-            <div className="text-center text-green text-[8px] tracking-widest animate-bounce">
+            <div className="text-center text-green text-[8px] tracking-widest animate-pulse">
                 WAITING FOR PLAYERS...
             </div>
 
@@ -73,7 +70,7 @@ export default function WaitingRoom({ isHost, roomId, onStart }: WaitingRoomProp
                             <PixelSelect
                                 height="h-8"
                                 onChange={(value) => handleSelectChange(label as IdentifierType, value)}
-                                value={''}
+                                value={room.setting?.[settingKeyMap[label as IdentifierType]] ?? ''}
                                 options={value} color={color}
                                 disabled={!isRoomOwner}
                             />

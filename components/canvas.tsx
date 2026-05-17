@@ -16,7 +16,7 @@ const Canvas = ({ room }: { room: Room }) => {
     const prePoint = useRef<{ x: number, y: number }>({ x: 0, y: 0 })
     const isDrawer = useRef<boolean>(false);
 
-    isDrawer.current = true
+    isDrawer.current = room.turnOrder[room.currentDrawerIndex] === socket.id
 
     function drawLines(x1: number, y1: number, x2: number, y2: number, color: string) {
         const ctx = canvasRef.current?.getContext('2d')
@@ -40,7 +40,6 @@ const Canvas = ({ room }: { room: Room }) => {
         })
     }
 
-    // ── Mouse ──────────────────────────────────────────
     function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
         if (!isDrawer.current) return
         isDrawing.current = true
@@ -64,7 +63,6 @@ const Canvas = ({ room }: { room: Room }) => {
         isDrawing.current = false
     }
 
-    // ── Touch ──────────────────────────────────────────
     function handleTouchStart(e: React.TouchEvent<HTMLCanvasElement>) {
         if (!isDrawer.current) return
         e.preventDefault()
@@ -91,7 +89,6 @@ const Canvas = ({ room }: { room: Room }) => {
         isDrawing.current = false
     }
 
-    // ── Actions ────────────────────────────────────────
     function handleClear() {
         const canvas = canvasRef.current
         if (!canvas) return
@@ -136,58 +133,60 @@ const Canvas = ({ room }: { room: Room }) => {
             />
 
             {/* Toolbar */}
-            <div className='bg-card-background h-12 md:h-16 p-2 flex justify-between items-center border-4 border-t-0 border-green'>
+            {isDrawer.current && (
+                <div className='bg-card-background h-12 md:h-16 p-2 flex justify-between items-center border-4 border-t-0 border-green'>
 
-                {/* Colors */}
-                <div className='grid grid-cols-4 grid-rows-2 gap-0.5'>
-                    {CANVAS_COLORS.map((butColor) => (
-                        <button
-                            onClick={() => setColor(butColor)}
-                            key={butColor}
-                            className={`${color === butColor ? 'border-2' : 'border-0'} hover:border-2 border-grey h-4 w-4 md:h-6 md:w-6`}
-                            style={{ backgroundColor: butColor }}
-                        />
-                    ))}
-                </div>
-
-                {/* Brush size placeholder */}
-                <div className='relative group'>
-                    <button className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]">
-                        <div className='h-2 w-2 bg-green-500 rounded-full'></div>
-                    </button>
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]"
-                        style={{ fontFamily: "'Press Start 2P', monospace" }}>
-                        Choose brush stroke
+                    {/* Colors */}
+                    <div className='grid grid-cols-4 grid-rows-2 gap-0.5'>
+                        {CANVAS_COLORS.map((butColor) => (
+                            <button
+                                onClick={() => setColor(butColor)}
+                                key={butColor}
+                                className={`${color === butColor ? 'border-2' : 'border-0'} hover:border-2 border-grey h-4 w-4 md:h-6 md:w-6`}
+                                style={{ backgroundColor: butColor }}
+                            />
+                        ))}
                     </div>
-                </div>
 
-                {/* Undo + Clear */}
-                <div className='flex gap-2'>
+                    {/* Brush size placeholder */}
                     <div className='relative group'>
-                        <button
-                            onClick={handleUndo}
-                            className="border-2 border-border bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
-                        >
-                            <Undo2 size={18} strokeWidth={3} />
+                        <button className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]">
+                            <div className='h-2 w-2 bg-green-500 rounded-full'></div>
                         </button>
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-border text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]">
-                            UNDO
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]"
+                            style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                            Choose brush stroke
                         </div>
                     </div>
 
-                    <div className='relative group'>
-                        <button
-                            onClick={handleClear}
-                            className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
-                        >
-                            <Trash size={18} strokeWidth={3} />
-                        </button>
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-red px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]">
-                            CLEAR
+                    {/* Undo + Clear */}
+                    <div className='flex gap-2'>
+                        <div className='relative group'>
+                            <button
+                                onClick={handleUndo}
+                                className="border-2 border-border bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
+                            >
+                                <Undo2 size={18} strokeWidth={3} />
+                            </button>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-border text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]">
+                                UNDO
+                            </div>
+                        </div>
+
+                        <div className='relative group'>
+                            <button
+                                onClick={handleClear}
+                                className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
+                            >
+                                <Trash size={18} strokeWidth={3} />
+                            </button>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-red px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]">
+                                CLEAR
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     )
 }

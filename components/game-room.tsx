@@ -24,7 +24,7 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
 
     useEffect(() => {
         const joinRoom = () => {
-            socket.emit(JOIN_ROOM, roomId, {
+            socket.emit(JOIN_ROOM, roomId, selectedLanguage, {
                 avatarColor: AVATAR_COLORS[activeAvatarIndex],
                 name: enteredUserName
             } as Player)
@@ -61,7 +61,7 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
                 {/* Section 2 */}
                 <div className="order-1 col-span-2 row-span-1 md:order-2 md:col-span-3 flex flex-col h-full">
                     {room?.phase === 'waiting' ? (
-                        <WaitingRoom isHost={room?.players.find(player => player.id === socket.id)?.isHost || false} onStart={onGameStart} roomId={room?.id ?? ''} />
+                        <WaitingRoom room={room} isHost={room?.players.find(player => player.id === socket.id)?.isHost || false} onStart={onGameStart} roomId={room?.id ?? ''} />
                     ) : room?.phase === 'selecting-word' ? (
                         <>
                             <GameRommMiniNavbar room={room} />
