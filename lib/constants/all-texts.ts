@@ -1,5 +1,5 @@
-// export const SERVER_URL = 'https://scribbbly-server.onrender.com'
-export const SERVER_URL = 'http://127.0.0.1:3000'
+export const SERVER_URL = 'https://scribbbly-server.onrender.com'
+// export const SERVER_URL = 'http://127.0.0.1:3000'
 
 export const LOGO_LETTERS = ['S', 'C', 'R', 'I', 'B', 'B', 'B', 'L', 'Y']
 
