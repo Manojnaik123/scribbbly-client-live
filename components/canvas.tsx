@@ -31,14 +31,33 @@ const Canvas = ({ room }: { room: Room }) => {
         ctx.stroke()
     }
 
+    // when emitting — normalize to 0-1
     function emitLine(x1: number, y1: number, x2: number, y2: number) {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
         socket.emit(DRAW_LINE, {
             roomId: room?.id,
             color,
             size: 2,
-            x1, y1, x2, y2
-        })
+            x1: x1 / canvas.width,
+            y1: y1 / canvas.height,
+            x2: x2 / canvas.width,
+            y2: y2 / canvas.height,
+        });
     }
+
+    // when receiving — denormalize back to pixels
+    socket.on(DRAWING_UPDATED, (stroke: Stroke) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        drawLines(
+            stroke.x1 * canvas.width,
+            stroke.y1 * canvas.height,
+            stroke.x2 * canvas.width,
+            stroke.y2 * canvas.height,
+            stroke.color
+        );
+    });
 
     function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
         if (!isDrawer.current) return
@@ -103,22 +122,36 @@ const Canvas = ({ room }: { room: Room }) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return
-        const rect = canvas.getBoundingClientRect()
-        canvas.width = rect.width
-        canvas.height = rect.height
+        if (!canvas) return;
+
+        // Resize canvas internal dimensions to match CSS display size
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            // Only resize if dimensions actually changed — resizing clears the canvas
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+        }
+
+        resizeCanvas(); // run on mount
+
+        const observer = new ResizeObserver(resizeCanvas);
+        observer.observe(canvas);
 
         socket.on(DRAWING_UPDATED, (stroke: Stroke) => {
-            drawLines(stroke.x1, stroke.y1, stroke.x2, stroke.y2, stroke.color)
-        })
+            drawLines(stroke.x1, stroke.y1, stroke.x2, stroke.y2, stroke.color);
+        });
 
         return () => {
-            socket.off(DRAWING_UPDATED)
-        }
-    }, [])
+            observer.disconnect();
+            socket.off(DRAWING_UPDATED);
+        };
+    }, []);
 
     return (
-        <div className="h-full w-full flex flex-col">
+        <div className="h-full w-full flex flex-col overflow-hidden">
             <canvas
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}

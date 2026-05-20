@@ -154,7 +154,7 @@ const GameStartingCard = ({
                         </div>
                     </div>
                     <PixelButton label={`> ${isInvitedUser ? 'JOIN ROOM' : 'PLAY'}! <`} color="green" fullWidth onClick={handlePLay} />
-                    <PixelButton label={`${ !buttonDisabled ?'[ CREATE PRIVATE ROOM ]' : '[CREATING ROOM...]'}`} color="cyan" fullWidth onClick={handleCreateRoom} disabled={buttonDisabled}/>
+                    <PixelButton label={`${ !buttonDisabled ?'[ CREATE PRIVATE ROOM ]' : '[ CREATING ROOM... ]'}`} color="cyan" fullWidth onClick={handleCreateRoom} disabled={buttonDisabled}/>
                 </div>
             </Suspense>
         </>
