@@ -42,13 +42,12 @@ export default function WaitingRoom({ room, isHost, roomId, onStart }: WaitingRo
     }
 
     function handleSelectChange(identifier: IdentifierType, value: (string | number)) {
-        console.log(identifier, value);
 
         const roomProp = settingKeyMap[identifier]
 
         console.log(roomId, roomProp, value);
 
-        socket.emit(SETTINGS_CHANGE, roomId, roomProp, value)
+        socket.emit(SETTINGS_CHANGE, roomId, roomProp, roomProp === 'language' ? value : Number(value))
     }
 
     console.log(room);

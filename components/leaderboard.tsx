@@ -2,6 +2,7 @@ import { Room } from '@shared/room'
 import socket from '@/lib/socket/socket'
 import React from 'react'
 import { RANK_STYLES } from '@/lib/colors/all-colors';
+import PixelButton from './pixel-button';
 
 
 
@@ -23,6 +24,10 @@ const Leaderboard = ({ room }: { room: Room }) => {
     }
     return { ...player, rank }
   })
+
+  function handlePLayAgain() {
+
+  }
 
   const top3 = rankedPlayers.filter(p => p.rank <= 3)
   const rest = rankedPlayers.filter(p => p.rank > 3)
@@ -121,6 +126,8 @@ const Leaderboard = ({ room }: { room: Room }) => {
       <span className="text-[7px] text-grey text-center mt-auto">
         THANKS FOR PLAYING!
       </span>
+      <PixelButton label={`> PLAY AGAIN! <`} color="green" fullWidth onClick={handlePLayAgain} />
+
     </div>
   )
 }

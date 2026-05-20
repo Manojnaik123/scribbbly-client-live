@@ -4,4 +4,5 @@ export type PixelButtonProps = {
     color?: 'green' | 'cyan' | 'pink' | 'yellow' | 'gray'
     fullWidth? : boolean
     className? : string
+    disabled? : boolean
 }

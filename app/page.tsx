@@ -18,6 +18,7 @@ export default function Home() {
 
   return (
     <Suspense fallback={null}>
+
       <div className="min-h-screen flex flex-col bg-background text-white">
 
         {/* Scanline overlay */}
@@ -45,6 +46,7 @@ export default function Home() {
               </p>
 
               <GameStartingCard
+              roomId={roomId}
                 selectedLanguage={selectedLanguage}
                 setSelectedLanguage={setSelectedLanguage}
                 setRoomId={setRoomId}

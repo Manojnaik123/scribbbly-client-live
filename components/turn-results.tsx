@@ -60,7 +60,7 @@ const TurnResults = ({ room }: { room: Room }) => {
                 </span>
               </div>
               <span className={`text-[9px] sm:text-[10px] ${correct ? 'text-green' : 'text-[#c80d0d]'}`}>
-                {correct ? `+${points}` : '-'}
+                {correct ? `+${points}` : '+0'}
               </span>
             </div>
           )
@@ -85,7 +85,7 @@ const TurnResults = ({ room }: { room: Room }) => {
               </span>
             </div>
             <span className={`text-[9px] sm:text-[10px] ${anyGuessed ? 'text-green' : 'text-[#c80d0d]'}`}>
-              {anyGuessed ? '+5' : '-'}
+              {anyGuessed ? '+5' : '+0'}
             </span>
           </div>
         )}

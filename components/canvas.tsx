@@ -9,7 +9,7 @@ import { DRAW_LINE, DRAWING_UPDATED } from '@shared/socket-names';
 import { Stroke } from '@shared/stroke';
 
 const Canvas = ({ room }: { room: Room }) => {
-    const [color, setColor] = useState<string>('black')
+    const [color, setColor] = useState<string>('#000000')
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const isDrawing = useRef<boolean>(false)
@@ -142,7 +142,7 @@ const Canvas = ({ room }: { room: Room }) => {
                             <button
                                 onClick={() => setColor(butColor)}
                                 key={butColor}
-                                className={`${color === butColor ? 'border-2' : 'border-0'} hover:border-2 border-grey h-4 w-4 md:h-6 md:w-6`}
+                                className={`${color === butColor ? 'border-2 border-grey' : 'border-0'} hover:border-2  h-4 w-4 md:h-6 md:w-6`}
                                 style={{ backgroundColor: butColor }}
                             />
                         ))}

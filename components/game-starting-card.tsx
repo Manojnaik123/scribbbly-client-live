@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useState } from 'react'
 import PixelButton from './pixel-button';
 import PixelAvatar from './pixel-avatar';
 import { AVATAR_COLORS } from '@/lib/colors/all-colors';
@@ -10,11 +10,9 @@ import PixelSelect from './pixel-select';
 import { LANGUAGES, LanguageType } from '@shared/language';
 import { GameStartingCardProps } from '@/lib/comp-props/game-starting-card-props';
 import { SERVER_URL } from '@/lib/constants/all-texts';
-import socket from '@/lib/socket/socket';
-
-
 
 const GameStartingCard = ({
+    roomId,
     setRoomId,
     selectedLanguage,
     setSelectedLanguage,
@@ -24,6 +22,8 @@ const GameStartingCard = ({
     setActiveAvatarIndex
 
 }: GameStartingCardProps) => {
+
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(false)
 
     const searchParams = useSearchParams()
 
@@ -47,6 +47,7 @@ const GameStartingCard = ({
     }
 
     async function handleCreateRoom() {
+        setButtonDisabled(true)
         const res = await fetch(`${SERVER_URL}/create-room`, {
             method: 'POST',
             headers: {
@@ -56,7 +57,10 @@ const GameStartingCard = ({
 
         const data = await res.json()
 
-        if (!data) return
+        if (!data) {
+            setButtonDisabled(false)
+            return
+        }
 
         setRoomId(data.roomId)
 
@@ -74,6 +78,7 @@ const GameStartingCard = ({
     return (
         <>
             <Suspense fallback={null}>
+                
                 <div className="w-full border-b-4 border-yellow pb-4">
                     <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
                         {AVATAR_COLORS.map((colorKey, i) => (
@@ -149,7 +154,7 @@ const GameStartingCard = ({
                         </div>
                     </div>
                     <PixelButton label={`> ${isInvitedUser ? 'JOIN ROOM' : 'PLAY'}! <`} color="green" fullWidth onClick={handlePLay} />
-                    <PixelButton label="[ CREATE PRIVATE ROOM ]" color="cyan" fullWidth onClick={handleCreateRoom} />
+                    <PixelButton label={`${ !buttonDisabled ?'[ CREATE PRIVATE ROOM ]' : '[CREATING ROOM...]'}`} color="cyan" fullWidth onClick={handleCreateRoom} disabled={buttonDisabled}/>
                 </div>
             </Suspense>
         </>
