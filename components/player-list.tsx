@@ -1,11 +1,7 @@
 'use client'
 
 import { Room } from '@shared/room';
-import React, { useEffect, useState } from 'react'
 import PlayerRow from './player-row';
-import socket from '@/lib/socket/socket';
-
-
 
 const PlayersList = ({ room }: { room: Room }) => {
     
@@ -18,8 +14,8 @@ const PlayersList = ({ room }: { room: Room }) => {
 
       {/* Player rows */}
       <div className="flex flex-col flex-1 overflow-y-auto">
-        {room && room.players.map((player) => (
-          <PlayerRow key={player.id} player={player} isActive={ (room.turnOrder ?? [])[(room.currentDrawerIndex ?? 0)] === player.id } />
+        {room && room.players.map((player, index) => (
+          <PlayerRow key={player.id} index={index + 1} player={player} isActive={ (room.turnOrder ?? [])[(room.currentDrawerIndex ?? 0)] === player.id } />
         ))}
       </div>
     </div>

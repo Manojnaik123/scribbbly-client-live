@@ -124,15 +124,16 @@ const Canvas = ({ room }: { room: Room }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Resize canvas internal dimensions to match CSS display size
         function resizeCanvas() {
             if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
-            // Only resize if dimensions actually changed — resizing clears the canvas
-            if (canvas.width !== rect.width || canvas.height !== rect.height) {
-                canvas.width = rect.width;
-                canvas.height = rect.height;
-            }
+           
+            // if (canvas.width !== rect.width || canvas.height !== rect.height) {
+            //     console.log('reached in side the condition');
+                
+            //     canvas.width = rect.width;
+            //     canvas.height = rect.height;
+            // }
         }
 
         resizeCanvas(); // run on mount

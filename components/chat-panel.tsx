@@ -38,15 +38,13 @@ const ChatPanel = ({ room }: { room: Room }) => {
     }, [])
 
     return (
-        <div className="flex flex-col h-full w-full  bg-background border-l-2 border-border">
+        <div className="flex flex-col h-full max-h-full overflow-hidden w-full  bg-background border-l-2 border-border">
 
-            {/* Header */}
             <div className="bg-card-background border-b-2 border-border px-3 py-2 shrink-0">
                 <span className="text-pink text-[7px] sm:text-[8px]">CHAT LOG</span>
             </div>
 
-            {/* Messages — scrollable, takes all remaining space */}
-            <div className="flex-1 overflow-y-auto flex flex-col gap-1 px-2 sm:px-3 py-2 min-h-0">
+            <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-1 px-2 sm:px-3 py-2 ">
                 {messages && (messages || []).map((msg, index) => (
                     <ChatLine key={`${msg.playerId}-${msg.text}-${index}`} message={msg} />
                 ))}

@@ -2,9 +2,10 @@
 
 import { PlayerRowProps } from "@/lib/comp-props/player-row-props";
 import PixelAvatar from "./pixel-avatar";
+import socket from "@/lib/socket/socket";
 
 export default function PlayerRow(
-    { player, isActive }: PlayerRowProps
+    { index, player, isActive }: PlayerRowProps
 ) {
 
     return (
@@ -16,7 +17,7 @@ export default function PlayerRow(
 
             {/* Rank */}
             <span className=" text-[6px] md:text-[7px] text-red w-3 md:w-5 shrink-0">
-                {'# ' + 1}
+                {'# ' + index}
             </span>
 
             {/* Avatar */}
@@ -42,11 +43,11 @@ export default function PlayerRow(
                         }`}
                 >
                     {player.name}
-                    {/* {socket.id === player.id ? ' [YOU]' : ''} */}
+                    {socket.id === player.id ? ' [YOU]' : ''}
                 </span>
 
                 <span className="text-[5px] md:text-[6px] text-green">
-                    {123} PTS {player.isHost && '[Host]'}
+                    {player.score} PTS {player.isHost && '[Host]'}
                 </span>
             </div>
 

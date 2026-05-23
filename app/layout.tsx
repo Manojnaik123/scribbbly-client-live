@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className='font-pixel'>{children}</body>
+      <body className='font-pixel h-screen min-h-screen flex flex-col '>{children}</body>
     </html>
   );
 }
