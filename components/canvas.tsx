@@ -8,21 +8,44 @@ import socket from '@/lib/socket/socket';
 import { DRAW_LINE, DRAWING_UPDATED } from '@shared/socket-names';
 import { Stroke } from '@shared/stroke';
 
+const STROKE_SIZES = [2, 5, 10];
+
+type DrawnStroke = {
+    x1: number; y1: number;
+    x2: number; y2: number;
+    color: string; size: number;
+}
+
 const Canvas = ({ room }: { room: Room }) => {
     const [color, setColor] = useState<string>('#000000')
+    const [strokeSize, setStrokeSize] = useState<number>(2)
+    const [showSizePicker, setShowSizePicker] = useState<boolean>(false)
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const isDrawing = useRef<boolean>(false)
     const prePoint = useRef<{ x: number, y: number }>({ x: 0, y: 0 })
-    const isDrawer = useRef<boolean>(false);
+    const isDrawer = useRef<boolean>(false)
+    const strokeHistory = useRef<DrawnStroke[][]>([]) // each mouse drag = one stroke group
+    const currentStroke = useRef<DrawnStroke[]>([])   // lines in current drag
 
     isDrawer.current = room.turnOrder[room.currentDrawerIndex] === socket.id
 
-    function drawLines(x1: number, y1: number, x2: number, y2: number, color: string) {
-        const ctx = canvasRef.current?.getContext('2d')
+    function redrawAll() {
+        const canvas = canvasRef.current
+        if (!canvas) return
+        const ctx = canvas.getContext('2d')
         if (!ctx) return
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        for (const group of strokeHistory.current) {
+            for (const s of group) {
+                drawLine(ctx, s.x1, s.y1, s.x2, s.y2, s.color, s.size)
+            }
+        }
+    }
+
+    function drawLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string, size: number) {
         ctx.strokeStyle = color
-        ctx.lineWidth = 2
+        ctx.lineWidth = size
         ctx.lineCap = 'round'
         ctx.lineJoin = 'round'
         ctx.beginPath()
@@ -31,13 +54,19 @@ const Canvas = ({ room }: { room: Room }) => {
         ctx.stroke()
     }
 
+    function drawLines(x1: number, y1: number, x2: number, y2: number, color: string, size: number = strokeSize) {
+        const ctx = canvasRef.current?.getContext('2d')
+        if (!ctx) return
+        drawLine(ctx, x1, y1, x2, y2, color, size)
+    }
+
     function emitLine(x1: number, y1: number, x2: number, y2: number) {
         const canvas = canvasRef.current;
         if (!canvas) return;
         socket.emit(DRAW_LINE, {
             roomId: room?.id,
             color,
-            size: 2,
+            size: strokeSize,
             x1: x1 / canvas.width,
             y1: y1 / canvas.height,
             x2: x2 / canvas.width,
@@ -48,6 +77,7 @@ const Canvas = ({ room }: { room: Room }) => {
     function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
         if (!isDrawer.current) return
         isDrawing.current = true
+        currentStroke.current = []
         const rect = canvasRef.current!.getBoundingClientRect()
         prePoint.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
@@ -58,19 +88,25 @@ const Canvas = ({ room }: { room: Room }) => {
         if (!canvas) return
         const rect = canvas.getBoundingClientRect()
         const curPoint = { x: e.clientX - rect.left, y: e.clientY - rect.top }
-        drawLines(prePoint.current.x, prePoint.current.y, curPoint.x, curPoint.y, color)
+        drawLines(prePoint.current.x, prePoint.current.y, curPoint.x, curPoint.y, color, strokeSize)
         emitLine(prePoint.current.x, prePoint.current.y, curPoint.x, curPoint.y)
+        currentStroke.current.push({ x1: prePoint.current.x, y1: prePoint.current.y, x2: curPoint.x, y2: curPoint.y, color, size: strokeSize })
         prePoint.current = curPoint
     }
 
     function handleMouseUp() {
         if (!isDrawer.current) return
+        if (currentStroke.current.length > 0) {
+            strokeHistory.current.push([...currentStroke.current])
+            currentStroke.current = []
+        }
         isDrawing.current = false
     }
 
     function handleTouchStart(e: React.TouchEvent<HTMLCanvasElement>) {
         if (!isDrawer.current) return
         e.preventDefault()
+        currentStroke.current = []
         const rect = canvasRef.current!.getBoundingClientRect()
         const touch = e.touches[0]
         isDrawing.current = true
@@ -85,12 +121,17 @@ const Canvas = ({ room }: { room: Room }) => {
         const rect = canvas.getBoundingClientRect()
         const touch = e.touches[0]
         const curPoint = { x: touch.clientX - rect.left, y: touch.clientY - rect.top }
-        drawLines(prePoint.current.x, prePoint.current.y, curPoint.x, curPoint.y, color)
+        drawLines(prePoint.current.x, prePoint.current.y, curPoint.x, curPoint.y, color, strokeSize)
         emitLine(prePoint.current.x, prePoint.current.y, curPoint.x, curPoint.y)
+        currentStroke.current.push({ x1: prePoint.current.x, y1: prePoint.current.y, x2: curPoint.x, y2: curPoint.y, color, size: strokeSize })
         prePoint.current = curPoint
     }
 
     function handleTouchEnd() {
+        if (currentStroke.current.length > 0) {
+            strokeHistory.current.push([...currentStroke.current])
+            currentStroke.current = []
+        }
         isDrawing.current = false
     }
 
@@ -100,10 +141,12 @@ const Canvas = ({ room }: { room: Room }) => {
         const ctx = canvas.getContext('2d')
         if (!ctx) return
         ctx.clearRect(0, 0, canvas.width, canvas.height)
+        strokeHistory.current = []
     }
 
     function handleUndo() {
-        // undo logic can be added later
+        strokeHistory.current.pop()
+        redrawAll()
     }
 
     useEffect(() => {
@@ -113,10 +156,10 @@ const Canvas = ({ room }: { room: Room }) => {
         function resizeCanvas() {
             if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
-
             if (canvas.width !== rect.width || canvas.height !== rect.height) {
                 canvas.width = rect.width;
                 canvas.height = rect.height;
+                redrawAll();
             }
         }
 
@@ -133,7 +176,8 @@ const Canvas = ({ room }: { room: Room }) => {
                 stroke.y1 * canvas.height,
                 stroke.x2 * canvas.width,
                 stroke.y2 * canvas.height,
-                stroke.color
+                stroke.color,
+                stroke.size ?? 2
             );
         });
 
@@ -158,7 +202,6 @@ const Canvas = ({ room }: { room: Room }) => {
                 style={{ touchAction: 'none' }}
             />
 
-            {/* Toolbar */}
             {isDrawer.current && (
                 <div className='bg-card-background h-12 md:h-16 p-2 flex justify-between items-center border-4 border-t-0 border-green'>
 
@@ -168,21 +211,44 @@ const Canvas = ({ room }: { room: Room }) => {
                             <button
                                 onClick={() => setColor(butColor)}
                                 key={butColor}
-                                className={`${color === butColor ? 'border-2 border-grey' : 'border-0'} hover:border-2  h-4 w-4 md:h-6 md:w-6`}
+                                className={`${color === butColor ? 'border-2 border-grey' : 'border-0'} hover:border-2 h-4 w-4 md:h-6 md:w-6`}
                                 style={{ backgroundColor: butColor }}
                             />
                         ))}
                     </div>
 
-                    {/* Brush size placeholder */}
+                    {/* Stroke size picker */}
                     <div className='relative group'>
-                        <button className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]">
-                            <div className='h-2 w-2 bg-green-500 rounded-full'></div>
+                        <button
+                            onClick={() => setShowSizePicker(p => !p)}
+                            className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
+                        >
+                            <div
+                                className='rounded-full bg-green-500'
+                                style={{ width: strokeSize * 2, height: strokeSize * 2, backgroundColor: color }}
+                            />
                         </button>
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]"
-                            style={{ fontFamily: "'Press Start 2P', monospace" }}>
-                            Choose brush stroke
-                        </div>
+
+                        {/* Size options — same style as undo/clear tooltip */}
+                        {showSizePicker && (
+                            <div
+                                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-green px-2 py-2 flex flex-col gap-2 items-center shadow-[3px_3px_0_#000] z-10"
+                                style={{ fontFamily: "'Press Start 2P', monospace" }}
+                            >
+                                {STROKE_SIZES.map((size) => (
+                                    <button
+                                        key={size}
+                                        onClick={() => { setStrokeSize(size); setShowSizePicker(false) }}
+                                        className={`flex items-center justify-center h-8 w-8 border-2 ${strokeSize === size ? 'border-green' : 'border-transparent'} hover:border-green bg-gray-700`}
+                                    >
+                                        <div
+                                            className='rounded-full bg-green-500'
+                                            style={{ width: size * 2, height: size * 2, backgroundColor: color }}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Undo + Clear */}
