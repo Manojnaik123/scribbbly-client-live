@@ -10,6 +10,8 @@ import PixelSelect from './pixel-select';
 import { LANGUAGES, LanguageType } from '@shared/language';
 import { GameStartingCardProps } from '@/lib/comp-props/game-starting-card-props';
 import { SERVER_URL } from '@/lib/constants/all-texts';
+import { playSound } from '@/lib/sound';
+import { useMute } from '@/context/mute-context';
 
 const GameStartingCard = ({
     roomId,
@@ -33,20 +35,26 @@ const GameStartingCard = ({
 
     const router = useRouter()
 
+    const { isMuted } = useMute()
+
 
     function prevAvatar() {
+        playSound('sounds/select.mp3', isMuted);
         setActiveAvatarIndex((i) => (i - 1 + AVATAR_COLORS.length) % AVATAR_COLORS.length)
     }
 
     function nextAvatar() {
+        playSound('sounds/select.mp3', isMuted);
         setActiveAvatarIndex((i) => (i + 1) % AVATAR_COLORS.length)
     }
 
     function randomAvatar() {
+        playSound('sounds/select.mp3', isMuted);
         setActiveAvatarIndex(Math.floor(Math.random() * AVATAR_COLORS.length))
     }
 
     async function handleCreateRoom() {
+        playSound('sounds/select.mp3', isMuted);
         setButtonDisabled(true)
         const res = await fetch(`${SERVER_URL}/create-room`, {
             method: 'POST',
@@ -68,6 +76,7 @@ const GameStartingCard = ({
     }
 
     async function handlePLay() {
+        playSound('sounds/select.mp3', isMuted);
         if (searchParamRoomId) {
             setRoomId(searchParamRoomId)
         } else {
@@ -86,6 +95,7 @@ const GameStartingCard = ({
                                 className="bg-card-background p-1 border-2 border-border shadow-[3px_3px_0_#000] cursor-pointer hover:border-yellow"
                                 style={{ animation: `pixelBounce 1.5s steps(2) infinite`, animationDelay: `${i * 0.15}s` }}
                                 onClick={() => {
+                                    playSound('sounds/select.mp3', isMuted);
                                     setActiveAvatarIndex(i)
                                 }}
                             >
@@ -107,6 +117,7 @@ const GameStartingCard = ({
                             type="text"
                             value={enteredUserName}
                             onChange={(e) => {
+                                playSound('sounds/type.mp3', isMuted);
                                 setEnteredUserName(e.target.value)
                             }}
                             placeholder="PLAYER_ONE"
@@ -120,7 +131,10 @@ const GameStartingCard = ({
                         <div className="flex gap-3">
                             <PixelSelect
                                 value={selectedLanguage}
-                                onChange={(value) => setSelectedLanguage(value as LanguageType)}
+                                onChange={(value) => {
+                                    playSound('sounds/select.mp3', isMuted);
+                                    setSelectedLanguage(value as LanguageType)
+                                }}
                                 options={LANGUAGES}
                                 color='pink'
                             />
@@ -142,8 +156,7 @@ const GameStartingCard = ({
                             >
                                 ‹
                             </button>
-                            <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={4} className="sm:" />
-                            {/* <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={6} className="hidden sm:block" /> */}
+                            <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={4} />
                             <button
                                 onClick={nextAvatar}
                                 className="text-text-white text-xl w-8 h-8 bg-dark-blue border-2 border-black shadow-[3px_3px_0_#000] hover:bg-[#3d3d8b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center"
@@ -153,7 +166,7 @@ const GameStartingCard = ({
                         </div>
                     </div>
                     <PixelButton label={`> ${isInvitedUser ? 'JOIN ROOM' : 'PLAY'}! <`} color="green" fullWidth onClick={handlePLay} />
-                    <PixelButton label={`${ !buttonDisabled ?'[ CREATE PRIVATE ROOM ]' : '[ CREATING ROOM... ]'}`} color="cyan" fullWidth onClick={handleCreateRoom} disabled={buttonDisabled}/>
+                    <PixelButton label={`${!buttonDisabled ? '[ CREATE PRIVATE ROOM ]' : '[ CREATING ROOM... ]'}`} color="cyan" fullWidth onClick={handleCreateRoom} disabled={buttonDisabled} />
                 </div>
             </Suspense>
         </>

@@ -33,13 +33,14 @@ export default function Home() {
     return (
       <div className="h-screen flex flex-col overflow-hidden bg-background text-white">
         <Overlays />
+        <Navbar />
         <GameRoom
           selectedLanguage={selectedLanguage}
           enteredUserName={enteredUserName}
           activeAvatarIndex={activeAvatarIndex}
           roomId={roomId}
         />
-        <Footer/>
+        <Footer />
       </div>
     )
   }
@@ -49,7 +50,7 @@ export default function Home() {
       <div className="min-h-screen flex flex-col bg-background text-white">
         <Overlays />
 
-        <Navbar />
+        <Navbar  />
         <div className="w-full h-1 bg-yellow" />
 
         <main className="flex-1 flex flex-col items-center px-4 py-8 gap-8">

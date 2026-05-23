@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
+import { MuteProvider } from "@/context/mute-context";
 
 const pressStart = Press_Start_2P({
   subsets: ["latin"],
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className='font-pixel h-screen min-h-screen flex flex-col '>{children}</body>
+      <MuteProvider>
+        <body className='font-pixel h-screen min-h-screen flex flex-col '>{children}</body>
+      </MuteProvider>
     </html>
   );
 }

@@ -3,6 +3,8 @@ import React from 'react'
 import GameRommMiniNavbar from './game-room-mini-navbar';
 import socket from '@/lib/socket/socket';
 import { WORD_SELECTED } from '@shared/socket-names';
+import { useMute } from '@/context/mute-context';
+import { playSound } from '@/lib/sound';
 
 const WordSelect = ({ room }: { room: Room }) => {
 
@@ -10,10 +12,13 @@ const WordSelect = ({ room }: { room: Room }) => {
 
     const isDrawer = curPlayerId === socket.id
 
+    const { isMuted } = useMute()
+
     function handleWordSelection(word: string) {
+        playSound('sounds/select.mp3', isMuted);
         socket.emit(WORD_SELECTED, {
             word,
-            roomId : room.id
+            roomId: room.id
         })
     }
 

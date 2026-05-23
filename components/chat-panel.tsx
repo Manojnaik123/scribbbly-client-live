@@ -9,6 +9,8 @@ import ChatLine from './chatline';
 import { Message } from '@shared/messages';
 import { GUESS, MESSAGES_UPDATED } from '@shared/socket-names';
 import socket from '@/lib/socket/socket';
+import { playSound } from '@/lib/sound';
+import { useMute } from '@/context/mute-context';
 
 
 const ChatPanel = ({ room }: { room: Room }) => {
@@ -17,8 +19,10 @@ const ChatPanel = ({ room }: { room: Room }) => {
 
     const isDrawing = room.turnOrder[room.currentDrawerIndex] === socket.id
 
+    const { isMuted } = useMute()
+
     function onGuessSubmit() {
-       
+
         socket.emit(GUESS, {
             guess: guess,
             roomId: room.id
@@ -56,9 +60,12 @@ const ChatPanel = ({ room }: { room: Room }) => {
                 <input
                     type="text"
                     value={guess}
-                    onChange={(e) => setGuess(e.target.value)}
+                    onChange={(e) => {
+                        playSound('sounds/type.mp3', isMuted)
+                        setGuess(e.target.value)
+                    }}
                     onKeyDown={(e) => e.key === 'Enter' && onGuessSubmit()}
-                    placeholder={isDrawing ? room.phase === 'waiting' ? 'YOU WILL DRAW FIRST':'YOU ARE DRAWING' : 'TYPE GUESS_'}
+                    placeholder={isDrawing ? room.phase === 'waiting' ? 'YOU WILL DRAW FIRST' : 'YOU ARE DRAWING' : 'TYPE GUESS_'}
                     disabled={isDrawing}
                     className="flex-1 min-w-0 bg-transparent text-green text-[6px] sm:text-[7px] outline-none placeholder:text-green/50 disabled:text-grey disabled:placeholder:text-grey/50"
                     style={{ fontFamily: "'Press Start 2P', monospace" }}

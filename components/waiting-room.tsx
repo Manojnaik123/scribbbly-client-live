@@ -11,6 +11,8 @@ import socket from "@/lib/socket/socket";
 import { DRAW_TIME, GAME_ROUNDS, LANGUAGES, PLAYER_COUNT } from "@/lib/constants/all-constants";
 import { WaitingRoomProps } from "@/lib/comp-props/waiting-room-prop";
 import { ROOM_UPDATED, SETTINGS_CHANGE } from "@/shared/socket-names";
+import { playSound } from "@/lib/sound";
+import { useMute } from "@/context/mute-context";
 
 const settings: {
     label: string
@@ -34,21 +36,22 @@ const settingKeyMap = {
 
 export default function WaitingRoom({ room, isHost, roomId, onStart }: WaitingRoomProps) {
 
-    const isRoomOwner: boolean = room?.players.find(player => player.isHost === true)?.id === socket.id
+    const isRoomOwner: boolean = room?.players.find(player => player.isHost === true)?.id === socket.id;
+
+    const { isMuted } = useMute()
 
     const copyInvite = () => {
+        playSound('sounds/select.mp3', isMuted);
         const url = window.location.href
         navigator.clipboard.writeText(url)
     }
 
     function handleSelectChange(identifier: IdentifierType, value: (string | number)) {
+        playSound('sounds/select.mp3', isMuted);
         const roomProp = settingKeyMap[identifier]
-
-        console.log(roomId, roomProp, value);
-
         socket.emit(SETTINGS_CHANGE, roomId, roomProp, roomProp === 'language' ? value : Number(value))
     }
-    
+
     return (
         <div className={`flex flex-col gap-4 p-4 bg-[#1a1a3e] border-2 border-green w-full h-full ${isHost ? '' : 'cursor-not-allowed'} `}>
 
@@ -78,7 +81,10 @@ export default function WaitingRoom({ room, isHost, roomId, onStart }: WaitingRo
             <div className="flex gap-3 mt-auto">
                 {isHost && (
                     <button
-                        onClick={() => onStart()}
+                        onClick={() => {
+                            playSound('sounds/select.mp3', isMuted);
+                            onStart()
+                        }}
                         className="flex-1 py-3 bg-[#00c853] shadow-[3px_3px_0_#000]
                             border-2 border-black active:translate-x-0.5 active:translate-y-0.5 active:shadow-none
                             text-white text-[10px] hover:bg-[#00a040] transition-colors">

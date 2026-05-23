@@ -1,6 +1,8 @@
 'use client'
 
+import { useMute } from '@/context/mute-context';
 import socket from '@/lib/socket/socket';
+import { playSound } from '@/lib/sound';
 import { Room } from '@shared/room';
 import { TIMER_TICK } from '@shared/socket-names';
 import React, { useEffect, useState } from 'react'
@@ -8,10 +10,13 @@ import React, { useEffect, useState } from 'react'
 const GameRommMiniNavbar = ({ room }: { room: Room }) => {
     const [timer, setTimer] = useState<number | null>(null)
 
+    const { isMuted } = useMute()
+
     useEffect(() => {
         const handleTimerTick = (
             timer: number | null
         ) => {
+            playSound('sounds/beep.mp3', isMuted)
             setTimer(timer)
         }
 
@@ -24,7 +29,7 @@ const GameRommMiniNavbar = ({ room }: { room: Room }) => {
             )
         }
     }, [])
-    
+
     return (
         <div className='flex justify-start items-center px-2 py-1 md:px-4 md:py-2 gap-4'>
             {(room.phase === 'drawing' || room.phase === 'selecting-word') && (

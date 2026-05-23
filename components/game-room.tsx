@@ -17,12 +17,18 @@ import GameRommMiniNavbar from './game-room-mini-navbar';
 import Canvas from './canvas';
 import Leaderboard from './leaderboard';
 import TurnResults from './turn-results';
+import Navbar from './landing-navbar';
+import { playSound } from '@/lib/sound';
+import { useMute } from '@/context/mute-context';
 
 
 const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage }: GameRoomProp) => {
     const [room, setRoom] = useState<Room | null>(null)
 
+    const { isMuted } = useMute()
+
     useEffect(() => {
+
         const joinRoom = () => {
             socket.emit(JOIN_ROOM, roomId, selectedLanguage, {
                 avatarColor: AVATAR_COLORS[activeAvatarIndex],
@@ -32,6 +38,8 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
 
         if (socket.connected) {
             joinRoom()
+            playSound('sounds/start.mp3', isMuted);
+
         } else {
             socket.on('connect', joinRoom)
         }
@@ -55,7 +63,6 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
 
     return (
         <div className=' flex flex-col h-screen'>
-            <GameNavbar roomName={roomId} />
             <div className="flex-1 overflow-hidden grid grid-cols-2 grid-rows-2 md:grid-cols-5 md:grid-rows-1">
 
                 {/* Section 2 */}

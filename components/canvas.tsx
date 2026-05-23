@@ -7,6 +7,8 @@ import { Room } from '@shared/room';
 import socket from '@/lib/socket/socket';
 import { DRAW_LINE, DRAWING_UPDATED } from '@shared/socket-names';
 import { Stroke } from '@shared/stroke';
+import { playSound } from '@/lib/sound';
+import { useMute } from '@/context/mute-context';
 
 const STROKE_SIZES = [2, 5, 10];
 
@@ -25,8 +27,10 @@ const Canvas = ({ room }: { room: Room }) => {
     const isDrawing = useRef<boolean>(false)
     const prePoint = useRef<{ x: number, y: number }>({ x: 0, y: 0 })
     const isDrawer = useRef<boolean>(false)
-    const strokeHistory = useRef<DrawnStroke[][]>([]) // each mouse drag = one stroke group
-    const currentStroke = useRef<DrawnStroke[]>([])   // lines in current drag
+    const strokeHistory = useRef<DrawnStroke[][]>([])
+    const currentStroke = useRef<DrawnStroke[]>([])
+
+    const { isMuted } = useMute()
 
     isDrawer.current = room.turnOrder[room.currentDrawerIndex] === socket.id
 
@@ -136,6 +140,7 @@ const Canvas = ({ room }: { room: Room }) => {
     }
 
     function handleClear() {
+        playSound('sounds/select.mp3', isMuted);
         const canvas = canvasRef.current
         if (!canvas) return
         const ctx = canvas.getContext('2d')
@@ -145,6 +150,7 @@ const Canvas = ({ room }: { room: Room }) => {
     }
 
     function handleUndo() {
+        playSound('sounds/select.mp3', isMuted);
         strokeHistory.current.pop()
         redrawAll()
     }
@@ -209,7 +215,10 @@ const Canvas = ({ room }: { room: Room }) => {
                     <div className='grid grid-cols-4 grid-rows-2 gap-0.5'>
                         {CANVAS_COLORS.map((butColor) => (
                             <button
-                                onClick={() => setColor(butColor)}
+                                onClick={() => {
+                                    setColor(butColor)
+                                    playSound('sounds/select.mp3', isMuted)
+                                }}
                                 key={butColor}
                                 className={`${color === butColor ? 'border-2 border-grey' : 'border-0'} hover:border-2 h-4 w-4 md:h-6 md:w-6`}
                                 style={{ backgroundColor: butColor }}
@@ -238,7 +247,7 @@ const Canvas = ({ room }: { room: Room }) => {
                                 {STROKE_SIZES.map((size) => (
                                     <button
                                         key={size}
-                                        onClick={() => { setStrokeSize(size); setShowSizePicker(false) }}
+                                        onClick={() => { playSound('sounds/select.mp3', isMuted); setStrokeSize(size); setShowSizePicker(false) }}
                                         className={`flex items-center justify-center h-8 w-8 border-2 ${strokeSize === size ? 'border-green' : 'border-transparent'} hover:border-green bg-gray-700`}
                                     >
                                         <div
