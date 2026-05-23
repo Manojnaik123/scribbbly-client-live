@@ -20,6 +20,7 @@ import TurnResults from './turn-results';
 import Navbar from './landing-navbar';
 import { playSound } from '@/lib/sound';
 import { useMute } from '@/context/mute-context';
+import { AlertTriangle } from 'lucide-react';
 
 
 const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage }: GameRoomProp) => {
@@ -38,18 +39,16 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
 
         if (socket.connected) {
             joinRoom()
-            playSound('sounds/start.mp3', isMuted);
-
         } else {
             socket.on('connect', joinRoom)
         }
 
         socket.on(ROOM_UPDATED, (room: Room) => {
+            playSound('sounds/start.mp3', isMuted);
             setRoom(room)
         })
 
         return () => {
-            socket.off('connect', joinRoom)
             socket.off(ROOM_UPDATED)
         }
     }, [])
@@ -59,7 +58,6 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
             roomId,
         })
     }
-
 
     return (
         <div className=' flex flex-col flex-1 overflow-hidden'>
@@ -86,7 +84,14 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
                     ) : room?.phase === 'leaderboard' ? (
                         <Leaderboard room={room} />
                     ) : (
-                        <>hi</>
+                       <div className='h-full w-full flex justify-center items-center'>
+                         <div className="flex items-center gap-3 border-b-2 border-red pb-4">
+                            <AlertTriangle className="h-6 w-6 text-red" />
+                            <h1 className="font-['Press_Start_2P'] text-xs sm:text-sm text-red tracking-wider">
+                                ROOM NOT FOUND
+                            </h1>
+                        </div>
+                       </div>
                     )}
                 </div>
 

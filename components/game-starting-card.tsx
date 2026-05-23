@@ -27,6 +27,8 @@ const GameStartingCard = ({
 
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false)
 
+    const [showError, setShowError] = useState<boolean>(false);
+
     const searchParams = useSearchParams()
 
     const searchParamRoomId = searchParams.get('roomId')
@@ -80,7 +82,7 @@ const GameStartingCard = ({
         if (searchParamRoomId) {
             setRoomId(searchParamRoomId)
         } else {
-            console.log('you cannnot join room without referal');
+            setShowError(true)
         }
     }
 
@@ -166,6 +168,7 @@ const GameStartingCard = ({
                         </div>
                     </div>
                     <PixelButton label={`> ${isInvitedUser ? 'JOIN ROOM' : 'PLAY'}! <`} color="green" fullWidth onClick={handlePLay} />
+                    {showError && <p className='text-[10px] text-red text-center'>NO ACTIVE GAME FOUND</p>}
                     <PixelButton label={`${!buttonDisabled ? '[ CREATE PRIVATE ROOM ]' : '[ CREATING ROOM... ]'}`} color="cyan" fullWidth onClick={handleCreateRoom} disabled={buttonDisabled} />
                 </div>
             </Suspense>
