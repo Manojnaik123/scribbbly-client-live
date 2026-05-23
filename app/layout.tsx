@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <MuteProvider>
-        <body className='font-pixel h-screen min-h-screen flex flex-col '>{children}</body>
+        <body className='font-pixel'>{children}</body>
       </MuteProvider>
     </html>
   );

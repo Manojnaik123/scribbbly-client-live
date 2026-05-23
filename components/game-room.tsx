@@ -62,8 +62,8 @@ const GameRoom = ({ roomId, activeAvatarIndex, enteredUserName, selectedLanguage
 
 
     return (
-        <div className=' flex flex-col h-screen'>
-            <div className="flex-1 overflow-hidden grid grid-cols-2 grid-rows-2 md:grid-cols-5 md:grid-rows-1">
+        <div className=' flex flex-col flex-1 overflow-hidden'>
+            <div className="flex-1 grid grid-cols-2 grid-rows-2 md:grid-cols-5 md:grid-rows-1">
 
                 {/* Section 2 */}
                 <div className="order-1 col-span-2 row-span-1 md:order-2 md:col-span-3 flex flex-col h-full">

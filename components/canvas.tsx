@@ -194,7 +194,8 @@ const Canvas = ({ room }: { room: Room }) => {
     }, []);
 
     return (
-        <div className="h-full w-full flex flex-col overflow-hidden">
+        <div className="h-full w-full relative">
+            {/* Canvas fills entire container */}
             <canvas
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}
@@ -204,46 +205,42 @@ const Canvas = ({ room }: { room: Room }) => {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                className="w-full flex-1 min-h-0 bg-white border-4 border-green"
+                className="w-full h-full bg-white border-4 border-green"
                 style={{ touchAction: 'none' }}
             />
 
+            {/* Toolbar floats above canvas */}
             {isDrawer.current && (
-                <div className='bg-card-background h-12 md:h-16 p-2 flex justify-between items-center border-4 border-t-0 border-green'>
+                <div className='absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 bg-card-background/95 border-2 border-green px-3 py-2 shadow-[4px_4px_0_#000]'>
 
                     {/* Colors */}
                     <div className='grid grid-cols-4 grid-rows-2 gap-0.5'>
                         {CANVAS_COLORS.map((butColor) => (
                             <button
-                                onClick={() => {
-                                    setColor(butColor)
-                                    playSound('sounds/select.mp3', isMuted)
-                                }}
+                                onClick={() => { setColor(butColor); playSound('sounds/select.mp3', isMuted) }}
                                 key={butColor}
-                                className={`${color === butColor ? 'border-2 border-grey' : 'border-0'} hover:border-2 h-4 w-4 md:h-6 md:w-6`}
+                                className={`${color === butColor ? 'border-2 border-white' : 'border-0'} hover:border-2 hover:border-white h-4 w-4 md:h-5 md:w-5`}
                                 style={{ backgroundColor: butColor }}
                             />
                         ))}
                     </div>
 
+                    <div className='w-px h-8 bg-green/40 shrink-0' />
+
                     {/* Stroke size picker */}
-                    <div className='relative group'>
+                    <div className='relative shrink-0'>
                         <button
                             onClick={() => setShowSizePicker(p => !p)}
-                            className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
+                            className="border-2 border-green/50 bg-gray-700 h-8 w-8 md:h-10 md:w-10 flex justify-center items-center shadow-[2px_2px_0_#000] hover:border-green"
                         >
                             <div
-                                className='rounded-full bg-green-500'
+                                className='rounded-full'
                                 style={{ width: strokeSize * 2, height: strokeSize * 2, backgroundColor: color }}
                             />
                         </button>
 
-                        {/* Size options — same style as undo/clear tooltip */}
                         {showSizePicker && (
-                            <div
-                                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-green px-2 py-2 flex flex-col gap-2 items-center shadow-[3px_3px_0_#000] z-10"
-                                style={{ fontFamily: "'Press Start 2P', monospace" }}
-                            >
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-green px-2 py-2 flex flex-col gap-2 items-center shadow-[3px_3px_0_#000] z-20">
                                 {STROKE_SIZES.map((size) => (
                                     <button
                                         key={size}
@@ -251,7 +248,7 @@ const Canvas = ({ room }: { room: Room }) => {
                                         className={`flex items-center justify-center h-8 w-8 border-2 ${strokeSize === size ? 'border-green' : 'border-transparent'} hover:border-green bg-gray-700`}
                                     >
                                         <div
-                                            className='rounded-full bg-green-500'
+                                            className='rounded-full'
                                             style={{ width: size * 2, height: size * 2, backgroundColor: color }}
                                         />
                                     </button>
@@ -260,16 +257,18 @@ const Canvas = ({ room }: { room: Room }) => {
                         )}
                     </div>
 
+                    <div className='w-px h-8 bg-green/40 shrink-0' />
+
                     {/* Undo + Clear */}
-                    <div className='flex gap-2'>
+                    <div className='flex gap-2 shrink-0'>
                         <div className='relative group'>
                             <button
                                 onClick={handleUndo}
-                                className="border-2 border-border bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
+                                className="border-2 border-green/50 bg-gray-700 h-8 w-8 md:h-10 md:w-10 flex justify-center items-center shadow-[2px_2px_0_#000] hover:border-green text-green"
                             >
-                                <Undo2 size={18} strokeWidth={3} />
+                                <Undo2 size={16} strokeWidth={3} />
                             </button>
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-border text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]">
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-green text-green px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[2px_2px_0_#000]">
                                 UNDO
                             </div>
                         </div>
@@ -277,11 +276,11 @@ const Canvas = ({ room }: { room: Room }) => {
                         <div className='relative group'>
                             <button
                                 onClick={handleClear}
-                                className="border-2 border-black bg-gray-600 text-green h-8 w-8 md:h-12 md:w-12 flex justify-center items-center shadow-[3px_3px_0_#000]"
+                                className="border-2 border-green/50 bg-gray-700 h-8 w-8 md:h-10 md:w-10 flex justify-center items-center shadow-[2px_2px_0_#000] hover:border-green text-green"
                             >
-                                <Trash size={18} strokeWidth={3} />
+                                <Trash size={16} strokeWidth={3} />
                             </button>
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-black text-red px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[3px_3px_0_#000]">
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card-background border-2 border-green text-red px-2 py-1 text-[7px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none shadow-[2px_2px_0_#000]">
                                 CLEAR
                             </div>
                         </div>

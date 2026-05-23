@@ -1,6 +1,8 @@
 import { Room } from '@shared/room'
 import socket from '@/lib/socket/socket'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { playSound } from '@/lib/sound';
+import { useMute } from '@/context/mute-context';
 
 const GUESS_POINTS = [7, 5, 3, 1]
 
@@ -10,6 +12,8 @@ const TurnResults = ({ room }: { room: Room }) => {
   const drawer = room.players.find(p => p.id === drawerId)
   const anyGuessed = correctGuesses.length > 0
   const currentSocketId = socket.id
+
+  const { isMuted } = useMute();
 
   const correctPlayers = correctGuesses
     .map((id, i) => ({
@@ -24,6 +28,10 @@ const TurnResults = ({ room }: { room: Room }) => {
     .map(player => ({ player, points: 0, correct: false }))
 
   const allResults = [...correctPlayers, ...missedPlayers]
+
+  useEffect(() => {
+    playSound('sounds/level-up.mp3', isMuted)
+  }, [])
 
   return (
     <div className="h-full bg-card-background border-4 border-green w-full p-6 sm:p-8 flex flex-col items-center gap-4 relative overflow-y-auto">

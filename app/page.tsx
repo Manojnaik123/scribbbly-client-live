@@ -31,7 +31,7 @@ export default function Home() {
 
   if (roomId) {
     return (
-      <div className="h-screen flex flex-col overflow-hidden bg-background text-white">
+      <div className="h-screen overflow-hidden  flex flex-col bg-background text-white">
         <Overlays />
         <Navbar />
         <GameRoom
