@@ -137,11 +137,6 @@ const Canvas = ({ room }: { room: Room }) => {
             );
         });
 
-
-        // socket.on(DRAWING_UPDATED, (stroke: Stroke) => {
-        //     drawLines(stroke.x1, stroke.y1, stroke.x2, stroke.y2, stroke.color);
-        // });
-
         return () => {
             observer.disconnect();
             socket.off(DRAWING_UPDATED);
