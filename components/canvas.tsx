@@ -205,7 +205,7 @@ const Canvas = ({ room }: { room: Room }) => {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                className="w-full h-full bg-white border-4 border-green"
+                className="w-full max-h-screen bg-white border-4 border-green"
                 style={{ touchAction: 'none' }}
             />
 
