@@ -78,7 +78,6 @@ const GameStartingCard = ({
     return (
         <>
             <Suspense fallback={null}>
-                
                 <div className="w-full border-b-4 border-yellow pb-4">
                     <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
                         {AVATAR_COLORS.map((colorKey, i) => (
@@ -143,8 +142,8 @@ const GameStartingCard = ({
                             >
                                 ‹
                             </button>
-                            <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={4} className="sm:hidden" />
-                            <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={6} className="hidden sm:block" />
+                            <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={4} className="sm:" />
+                            {/* <PixelAvatar color={AVATAR_COLORS[activeAvatarIndex]} scale={6} className="hidden sm:block" /> */}
                             <button
                                 onClick={nextAvatar}
                                 className="text-text-white text-xl w-8 h-8 bg-dark-blue border-2 border-black shadow-[3px_3px_0_#000] hover:bg-[#3d3d8b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center"

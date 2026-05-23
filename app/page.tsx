@@ -16,59 +16,64 @@ export default function Home() {
   const [enteredUserName, setEnteredUserName] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageType>('ENGLISH')
 
+  const Overlays = () => (
+    <>
+      <div
+        className="fixed inset-0 pointer-events-none z-50"
+        style={{ background: 'repeating-linear-gradient(transparent 0px, transparent 1px, rgba(0,0,0,0.15) 1px, rgba(0,0,0,0.15) 2px)' }}
+      />
+      <div
+        className="fixed inset-0 pointer-events-none z-40"
+        style={{ background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%)' }}
+      />
+    </>
+  )
+
+  if (roomId) {
+    return (
+      <div className="h-screen flex flex-col overflow-hidden bg-background text-white">
+        <Overlays />
+        <GameRoom
+          selectedLanguage={selectedLanguage}
+          enteredUserName={enteredUserName}
+          activeAvatarIndex={activeAvatarIndex}
+          roomId={roomId}
+        />
+        <Footer/>
+      </div>
+    )
+  }
+
   return (
     <Suspense fallback={null}>
-
       <div className="min-h-screen flex flex-col bg-background text-white">
+        <Overlays />
 
-        {/* Scanline overlay */}
-        <div
-          className="fixed inset-0 pointer-events-none z-50"
-          style={{ background: 'repeating-linear-gradient(transparent 0px, transparent 1px, rgba(0,0,0,0.15) 1px, rgba(0,0,0,0.15) 2px)' }}
-        />
+        <Navbar />
+        <div className="w-full h-1 bg-yellow" />
 
-        {/* CRT vignette */}
-        <div
-          className="fixed inset-0 pointer-events-none z-40"
-          style={{ background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%)' }}
-        />
+        <main className="flex-1 flex flex-col items-center px-4 py-8 gap-8">
+          <LandingPageLogo />
 
-        {!roomId ? (
-          <>
-            <Navbar />
-            <div className="w-full h-1 bg-yellow" />
+          <p className="text-green text-[6px] sm:text-[8px] tracking-widest text-center">
+            {`>> DRAW. GUESS. WIN. <<`}
+          </p>
 
-            <main className="flex-1 flex flex-col items-center px-4 py-8 gap-8">
-              <LandingPageLogo />
-
-              <p className="text-green text-[6px] sm:text-[8px] tracking-widest text-center">
-                {`>> DRAW. GUESS. WIN. <<`}
-              </p>
-
-              <GameStartingCard
-              roomId={roomId}
-                selectedLanguage={selectedLanguage}
-                setSelectedLanguage={setSelectedLanguage}
-                setRoomId={setRoomId}
-                enteredUserName={enteredUserName}
-                setEnteredUserName={setEnteredUserName}
-                activeAvatarIndex={activeAvatarIndex}
-                setActiveAvatarIndex={setActiveAvatarIndex} />
-
-              <InformationSection />
-            </main>
-          </>
-        ) : (
-          <GameRoom
-            selectedLanguage={selectedLanguage}
-            enteredUserName={enteredUserName}
-            activeAvatarIndex={activeAvatarIndex}
+          <GameStartingCard
             roomId={roomId}
+            selectedLanguage={selectedLanguage}
+            setSelectedLanguage={setSelectedLanguage}
+            setRoomId={setRoomId}
+            enteredUserName={enteredUserName}
+            setEnteredUserName={setEnteredUserName}
+            activeAvatarIndex={activeAvatarIndex}
+            setActiveAvatarIndex={setActiveAvatarIndex}
           />
-        )}
 
+          <InformationSection />
+        </main>
         <Footer />
       </div>
     </Suspense>
-  );
+  )
 }
