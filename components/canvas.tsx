@@ -211,7 +211,7 @@ const Canvas = ({ room }: { room: Room }) => {
 
             {/* Toolbar floats above canvas */}
             {isDrawer.current && (
-                <div className='absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 bg-card-background/95 border-2 border-green px-3 py-2 shadow-[4px_4px_0_#000]'>
+                <div className='absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 bg-card-background/95 border-2 border-green px-3 py-2 shadow-[4px_4px_0_#000] w-2/3'>
 
                     {/* Colors */}
                     <div className='grid grid-cols-4 grid-rows-2 gap-0.5'>
