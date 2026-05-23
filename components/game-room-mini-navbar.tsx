@@ -24,7 +24,7 @@ const GameRommMiniNavbar = ({ room }: { room: Room }) => {
             )
         }
     }, [])
-
+    
     return (
         <div className='flex justify-start items-center px-2 py-1 md:px-4 md:py-2 gap-4'>
             {(room.phase === 'drawing' || room.phase === 'selecting-word') && (
@@ -34,7 +34,7 @@ const GameRommMiniNavbar = ({ room }: { room: Room }) => {
             )}
             <div className=' flex flex-col'>
                 <span className='text-[6px] sm:text-[8px] text-yellow'>Round</span>
-                <span className="text-[8px] sm:text-[10px] text-text-white">{room.curRound} / {room?.maxRounds}</span>
+                <span className="text-[8px] sm:text-[10px] text-text-white">{room.curRound} / {room?.setting?.maxRounds}</span>
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center gap-1 min-w-0">

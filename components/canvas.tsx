@@ -31,7 +31,6 @@ const Canvas = ({ room }: { room: Room }) => {
         ctx.stroke()
     }
 
-    // when emitting — normalize to 0-1
     function emitLine(x1: number, y1: number, x2: number, y2: number) {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -45,19 +44,6 @@ const Canvas = ({ room }: { room: Room }) => {
             y2: y2 / canvas.height,
         });
     }
-
-    // when receiving — denormalize back to pixels
-    socket.on(DRAWING_UPDATED, (stroke: Stroke) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        drawLines(
-            stroke.x1 * canvas.width,
-            stroke.y1 * canvas.height,
-            stroke.x2 * canvas.width,
-            stroke.y2 * canvas.height,
-            stroke.color
-        );
-    });
 
     function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
         if (!isDrawer.current) return
@@ -127,23 +113,34 @@ const Canvas = ({ room }: { room: Room }) => {
         function resizeCanvas() {
             if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
-           
-            // if (canvas.width !== rect.width || canvas.height !== rect.height) {
-            //     console.log('reached in side the condition');
-                
-            //     canvas.width = rect.width;
-            //     canvas.height = rect.height;
-            // }
+
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
         }
 
-        resizeCanvas(); // run on mount
+        resizeCanvas();
 
         const observer = new ResizeObserver(resizeCanvas);
         observer.observe(canvas);
 
         socket.on(DRAWING_UPDATED, (stroke: Stroke) => {
-            drawLines(stroke.x1, stroke.y1, stroke.x2, stroke.y2, stroke.color);
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            drawLines(
+                stroke.x1 * canvas.width,
+                stroke.y1 * canvas.height,
+                stroke.x2 * canvas.width,
+                stroke.y2 * canvas.height,
+                stroke.color
+            );
         });
+
+
+        // socket.on(DRAWING_UPDATED, (stroke: Stroke) => {
+        //     drawLines(stroke.x1, stroke.y1, stroke.x2, stroke.y2, stroke.color);
+        // });
 
         return () => {
             observer.disconnect();
@@ -162,7 +159,7 @@ const Canvas = ({ room }: { room: Room }) => {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                className="w-full h-full bg-white border-4 border-green"
+                className="w-full flex-1 min-h-0 bg-white border-4 border-green"
                 style={{ touchAction: 'none' }}
             />
 

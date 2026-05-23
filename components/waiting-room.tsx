@@ -42,17 +42,13 @@ export default function WaitingRoom({ room, isHost, roomId, onStart }: WaitingRo
     }
 
     function handleSelectChange(identifier: IdentifierType, value: (string | number)) {
-
         const roomProp = settingKeyMap[identifier]
 
         console.log(roomId, roomProp, value);
 
         socket.emit(SETTINGS_CHANGE, roomId, roomProp, roomProp === 'language' ? value : Number(value))
     }
-
-    console.log(room);
     
-
     return (
         <div className={`flex flex-col gap-4 p-4 bg-[#1a1a3e] border-2 border-green w-full h-full ${isHost ? '' : 'cursor-not-allowed'} `}>
 
